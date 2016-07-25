@@ -23,7 +23,7 @@ import static com.example.ashishbahl.popularmovies.data.MovieContract.MovieEntry
 /**
  * Created by Ashish Bahl on 06-Jul-16.
  */
-public class MovieDataTask extends AsyncTask<String,Void,Void> {
+public class MovieDataTask extends AsyncTask<Void,Void,Void> {
 
     private final String LOG_TAG = MovieDataTask.class.getSimpleName() ;
 //    private ProgressDialog dialog = new ProgressDialog(getActivity());
@@ -46,12 +46,15 @@ public class MovieDataTask extends AsyncTask<String,Void,Void> {
     {
         final String MDB_RESULT = "results";
         final String MDB_ID = "id";
-        final String MDB_PATH= "poster_path";
-        final String MDB_TITLE="original_title";
+        final String MDB_POSTER_PATH= "poster_path";
+        final String MDB_BACKDROP_PATH = "backdrop_path";
+        final String MDB_TITLE="title";
         final String MDB_OVERVIEW="overview";
         final String MDB_VOTE="vote_average";
         final String MDB_DATE="release_date";
+        final String MDB_POPULARITY = "popularity";
         final String MDB_URL_PREFIX= "http://image.tmdb.org/t/p/w185";
+        final String MDB_BACKDROP_PREFIX = "http://image.tmdb.org/t/p/w500";
 
         try {
             JSONObject movieJson = new JSONObject(movieDataStr);
@@ -66,22 +69,29 @@ public class MovieDataTask extends AsyncTask<String,Void,Void> {
                 String vote;
                 String date;
                 String id;
+                String backdrop_url;
+                double popularity;
                 JSONObject movie1 = movieArray.getJSONObject(i);
-                poster_url = MDB_URL_PREFIX + movie1.getString(MDB_PATH);
+                poster_url = MDB_URL_PREFIX + movie1.getString(MDB_POSTER_PATH);
+                backdrop_url = MDB_BACKDROP_PREFIX + movie1.getString(MDB_BACKDROP_PATH);
                 id = movie1.getString(MDB_ID);
                 title = movie1.getString(MDB_TITLE);
                 overview = movie1.getString(MDB_OVERVIEW);
                 vote = movie1.getString(MDB_VOTE);
                 date = movie1.getString(MDB_DATE);
+                popularity = movie1.getDouble(MDB_POPULARITY);
 
                 ContentValues movieValues = new ContentValues();
 
                 movieValues.put(MovieEntry.COLUMN_MOVIE_ID, id);
                 movieValues.put(MovieEntry.COLUMN_POSTERPATH, poster_url);
+                movieValues.put(MovieEntry.COLUMN_BACKDROP, backdrop_url);
                 movieValues.put(MovieEntry.COLUMN_TITLE, title);
                 movieValues.put(MovieEntry.COLUMN_RELEASE_DATE, date);
                 movieValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, vote);
                 movieValues.put(MovieEntry.COLUMN_OVERVIEW, overview);
+                movieValues.put(MovieEntry.COLUMN_POPULARITY, popularity);
+                movieValues.put(MovieEntry.COLUMN_IS_FAV,0);
 
                 cVVector.add(movieValues);
             }
@@ -110,59 +120,63 @@ public class MovieDataTask extends AsyncTask<String,Void,Void> {
 //        this.dialog.show();
 //    }
     @Override
-    protected Void doInBackground(String... params) {
+    protected Void doInBackground(Void... params) {
 
-        if(params.length == 0)
-            return null;
+        /*if(params.length == 0)
+            return null;*/
 
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
+        String sort[] = {"popular", "top_rated"};
         //Will contain the response as a raw JSON string.
         String movieDataStr = null;
 
         try{
-            //Here we construct the url for the movie database query
-            //http://api.themoviedb.org/3/discover/movie?
+            for(int i=0;i<2;i++) {
 
-            final String BASE_URL = "http://api.themoviedb.org/3/movie/";
-            //final String QUERY_PARAM = "sort_by";// sorting parameter popularity or rating
-            final String APPID_PARAM = "api_key";
-            Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                    .appendPath(params[0])
-                    //.appendQueryParameter(QUERY_PARAM,params[0]) //String key , String value
-                    .appendQueryParameter(APPID_PARAM,BuildConfig.THE_MOVIE_DATABASE_API_KEY)
-                    .build();
-            URL url = new URL(builtUri.toString());
+                //Here we construct the url for the movie database query
+                //http://api.themoviedb.org/3/movie?
 
-            // Create the request to TheMovieDatabase, and open the connection
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
+                final String BASE_URL = "http://api.themoviedb.org/3/movie/";
+                //final String QUERY_PARAM = "sort_by";// sorting parameter popularity or rating
+                final String APPID_PARAM = "api_key";
+                Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                        .appendPath(sort[i])
+                        //.appendQueryParameter(QUERY_PARAM,params[0]) //String key , String value
+                        .appendQueryParameter(APPID_PARAM, BuildConfig.THE_MOVIE_DATABASE_API_KEY)
+                        .build();
+                URL url = new URL(builtUri.toString());
 
-            //read the input stream into a string
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
-            if(inputStream == null) {
-                //Do Nothing
-                return null;
+                // Create the request to TheMovieDatabase, and open the connection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                //read the input stream into a string
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+                    //Do Nothing
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a *lot* easier if you print out the completed
+                    // buffer for debugging.
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    //Stream was empty.No point in parsing.
+                    return null;
+                }
+                movieDataStr = buffer.toString();
+                getMovieDatafromJSONString(movieDataStr);
             }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine())!= null){
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
-                buffer.append(line + "\n");
-            }
-
-            if(buffer.length() == 0) {
-                //Stream was empty.No point in parsing.
-                return null;
-            }
-            movieDataStr = buffer.toString();
-            getMovieDatafromJSONString(movieDataStr);
         }
         catch (IOException e){
             // If the code didn't successfully get the weather data, there's no point in attemping
@@ -186,11 +200,10 @@ public class MovieDataTask extends AsyncTask<String,Void,Void> {
         }
         return null;
     }
-//    @Override
-//    protected void onPostExecute(Void a){
-//        if (dialog.isShowing()) {
-//            dialog.dismiss();
-//        }
-//    }
+    /*@Override
+    protected void onPostExecute(Void a){
+        mainFragment.resetLoader();
+
+    }*/
 }
 

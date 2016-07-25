@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,11 +22,13 @@ import com.squareup.picasso.Picasso;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-
+    static final String DETAIL_ID = "ID";
+    private String mId;
     private static final int DETAIL_LOADER= 0;
     private static final String[] GRID_COLUMNS = {
             MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_POSTERPATH,
+            MovieContract.MovieEntry.COLUMN_BACKDROP,
             MovieContract.MovieEntry.COLUMN_TITLE,
             MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE,
@@ -36,10 +37,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     static final int COL_ID = 0;
     static final int COL_MOVIE_POSTER_PATH = 1;
-    static final int COL_MOVIE_TITLE = 2;
-    static final int COL_MOVIE_RELEASE_DATE = 3;
-    static final int COL_MOVIE_VOTE_AVERAGE = 4;
-    static final int COL_MOVIE_OVERVIEW = 5;
+    static final int COL_MOVIE_BACKDROP = 2;
+    static final int COL_MOVIE_TITLE = 3;
+    static final int COL_MOVIE_RELEASE_DATE = 4;
+    static final int COL_MOVIE_VOTE_AVERAGE = 5;
+    static final int COL_MOVIE_OVERVIEW = 6;
 
     public DetailFragment() {
     }
@@ -63,10 +65,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (intent == null) {
             return null;
         }
-
+        String movieid = intent.getStringExtra(MainFragment.MOV_KEY);
         return new CursorLoader(
                 getActivity(),
-                intent.getData(),
+                MovieContract.MovieEntry.buildMoviesID(movieid),
                 GRID_COLUMNS,
                 null,
                 null,
@@ -89,7 +91,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         TextView overview = (TextView) getView().findViewById(R.id.overview);
         overview.setText(data.getString(COL_MOVIE_OVERVIEW));
-        Log.v(LOG_TAG, data.getString(COL_MOVIE_OVERVIEW));
 
         ImageView poster = (ImageView) getView().findViewById(R.id.poster);
         String posterpath = data.getString(COL_MOVIE_POSTER_PATH);
@@ -97,6 +98,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 .with(getActivity())
                 .load(posterpath)
                 .into(poster);
+        /*ImageView backdrop = (ImageView) getView().findViewById(R.id.header);
+        String backdrop_path = data.getString(COL_MOVIE_BACKDROP);
+        Picasso
+                .with(getActivity())
+                .load(backdrop_path)
+                .into(backdrop);*/
     }
 
     @Override

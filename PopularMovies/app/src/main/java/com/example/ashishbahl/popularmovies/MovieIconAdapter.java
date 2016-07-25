@@ -2,19 +2,21 @@ package com.example.ashishbahl.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 /**
  * Created by Ashish Bahl on 31-May-16.
  */
 public class MovieIconAdapter extends CursorAdapter {
-    ImageView posterView ;
     private final String LOG_TAG = MovieIconAdapter.class.getSimpleName();
 
     public MovieIconAdapter(Context context, Cursor c, int flags) {
@@ -30,13 +32,39 @@ public class MovieIconAdapter extends CursorAdapter {
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        String poster_path = cursor.getString(MainFragment.COL_MOVIE_POSTER_PATH);
-        posterView = (ImageView) view.findViewById(R.id.movie_image);
+    public void bindView(View view, final Context context, Cursor cursor) {
+        final String poster_path = cursor.getString(MainFragment.COL_MOVIE_POSTER_PATH);
+        final ImageView posterView = (ImageView) view.findViewById(R.id.movie_image);
         Picasso
                 .with(context)
                 .load(poster_path)
-                .into(posterView);
+                .networkPolicy(NetworkPolicy.OFFLINE)
+                .into(posterView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError() {
+                        //Try again online if cache failed
+                        Picasso.with(context)
+                                .load(poster_path)
+                                .error(R.drawable.photo)
+                                .into(posterView, new Callback() {
+                                    @Override
+                                    public void onSuccess() {
+
+                                    }
+
+                                    @Override
+                                    public void onError() {
+                                        Log.v("Picasso", "Could not fetch image");
+                                    }
+                                });
+                    }
+                });
+
     }
 
 }

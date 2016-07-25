@@ -20,7 +20,13 @@
     <string name="pref_sort_label_rating">Top Rated</string>
     <string name="pref_sort_rating">top_rated</string>
 
+    <string name="pref_sort_label_favorite">Favorite</string>
+    <string name="pref_sort_favorite">favorite</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="content_authority" translatable="false">com.example.ashishbahl.popularmovies</string>
+    <string name="action_share">Share</string>
+    <string name="action_favorite">Favorite</string>
+
 </resources>

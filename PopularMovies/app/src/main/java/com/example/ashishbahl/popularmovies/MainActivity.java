@@ -1,5 +1,6 @@
 package com.example.ashishbahl.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,7 +8,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.facebook.stetho.DumperPluginsProvider;
+import com.facebook.stetho.Stetho;
+import com.facebook.stetho.dumpapp.DumperPlugin;
+
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
+    private boolean mTwoPane;
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,6 +24,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        if (findViewById(R.id.movie_detail_container) != null) {
+            mTwoPane = true;
+            if (savedInstanceState == null){
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.movie_detail_container,new DetailFragment(),DETAILFRAGMENT_TAG)
+                        .commit();
+            }
+            else {
+                mTwoPane = false;
+                getSupportActionBar().setElevation(0f);
+            }
+        }
+        final Context context = this;
+        Stetho.initialize(
+                Stetho.newInitializerBuilder(context)
+                        .enableDumpapp(new SampleDumperPluginsProvider(context))
+                        .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(context))
+                        .build()
+        );
 
     }
 
@@ -41,4 +70,21 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    private static class SampleDumperPluginsProvider implements DumperPluginsProvider{
+        private Context mContext;
+        public SampleDumperPluginsProvider(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public Iterable<DumperPlugin> get() {
+            ArrayList<DumperPlugin> plugins = new ArrayList<DumperPlugin>();
+            for(DumperPlugin defaultPlugin: Stetho.defaultDumperPluginsProvider(mContext).get()){
+                plugins.add(defaultPlugin);
+            }
+            return plugins;
+        }
+    }
+
 }

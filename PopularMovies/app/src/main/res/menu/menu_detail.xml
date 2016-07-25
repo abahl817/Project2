@@ -2,6 +2,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.android.sunshine.app.DetailActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="1"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_share_white_24dp"
+        android:title="@string/action_share"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/favorite1"
+        android:title="@string/action_favorite"
+        android:icon="@drawable/ic_favorite_border_white_24dp"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/favorite2"
+        android:title="@string/action_favorite"
+        android:icon="@drawable/ic_favorite_white_24dp"
+        app:showAsAction="ifRoom"/>
 </menu>
