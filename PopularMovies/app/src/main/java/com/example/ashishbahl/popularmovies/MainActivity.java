@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private boolean mTwoPane;
-    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+    private static final String VIEWPAGERFRAGMENT_TAG = "VPFTAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
             mTwoPane = true;
             if (savedInstanceState == null){
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.movie_detail_container,new DetailFragment(),DETAILFRAGMENT_TAG)
+                        .replace(R.id.movie_detail_container,new ViewPagerFragment(),VIEWPAGERFRAGMENT_TAG)
                         .commit();
             }
             else {
