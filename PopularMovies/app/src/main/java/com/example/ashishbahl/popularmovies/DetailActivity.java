@@ -13,6 +13,17 @@ public class DetailActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .add(android.R.id.content, new ViewPagerFragment()).commit();
         }
+        /*if(savedInstanceState == null){
+            Bundle arguments = new Bundle();
+            arguments.putString(ViewPagerFragment.VIEWPAGER_ID,getIntent().getStringExtra(MainFragment.MOV_KEY));
+
+            ViewPagerFragment fragment = new ViewPagerFragment();
+            fragment.setArguments(arguments);
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.movie_detail_container,fragment)
+                    .commit();
+        }*/
     }
 }
 

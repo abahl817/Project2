@@ -1,6 +1,5 @@
 package com.example.ashishbahl.popularmovies;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -114,9 +113,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
                     String ID = cursor.getString(COL_MOVIE_ID);
-                    Intent intent = new Intent(getActivity(), DetailActivity.class)
-                            .putExtra(MOV_KEY, ID);
-                    startActivity(intent);
+                    ((Callback) getActivity()).onItemSelected(ID);
+                    /*Intent intent = new Intent(getActivity(), DetailActivity.class)
+                                .putExtra(MOV_KEY, ID);
+                    startActivity(intent);*/
                 }
                 mPosition = position;
 

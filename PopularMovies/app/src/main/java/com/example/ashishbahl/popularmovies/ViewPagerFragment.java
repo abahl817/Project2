@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 public class ViewPagerFragment extends Fragment {
+    Toolbar mToolbar;
     TabLayout mTabLayout;
     ViewPager mViewPager;
     final String LOG_TAG = MainFragment.class.getSimpleName();
@@ -39,7 +41,8 @@ public class ViewPagerFragment extends Fragment {
     private String mLink;
     private boolean favClicked;
     private final String TRAILERFRAGMENT_TAG = "TFTAG";
-
+    static final String VIEWPAGER_ID = "ID";
+    private String mId;
 
     public ViewPagerFragment() {
         // Required empty public constructor
@@ -55,12 +58,14 @@ public class ViewPagerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+        if(arguments != null){
+            mId = arguments.getString(ViewPagerFragment.VIEWPAGER_ID);
+        }
         View rootView = inflater.inflate(R.layout.fragment_view_pager, container, false);
         favClicked = isFavorite();
-        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
-        /*setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);*/
+        mToolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+
         final CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) rootView.findViewById(
                 R.id.collapse_toolbar);
 
@@ -85,6 +90,15 @@ public class ViewPagerFragment extends Fragment {
         fragmentTransaction.add(fragment, TRAILERFRAGMENT_TAG);
         fragmentTransaction.commit();*/
         return rootView;
+    }
+    @Override
+    public void onActivityCreated( Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // Since you need to reference your activity, you could use this method
+        // which is "Called when the fragment's activity has been created and this fragment's view hierarchy instantiated"
+        ((AppCompatActivity)getActivity()).setSupportActionBar(mToolbar);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayShowTitleEnabled(false);
     }
 
 
@@ -117,7 +131,6 @@ public class ViewPagerFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.viewpagerfragment, menu);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -242,10 +255,15 @@ public class ViewPagerFragment extends Fragment {
             fav = false;
         return fav;
     }
-    
+
     private String getid(){
         Intent intent = getActivity().getIntent();
-        String movieid = intent.getStringExtra(MainFragment.MOV_KEY);
+        String movieid = null;
+        if(intent != null){
+            movieid = intent.getStringExtra(MainFragment.MOV_KEY);
+        }
+        else
+            movieid = mId;
         return movieid;
     }
 
