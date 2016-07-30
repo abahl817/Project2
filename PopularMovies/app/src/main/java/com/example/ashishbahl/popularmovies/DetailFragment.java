@@ -22,7 +22,6 @@ import com.squareup.picasso.Picasso;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-    static final String DETAIL_ID = "ID";
     private String mId;
     private static final int DETAIL_LOADER= 0;
     private static final String[] GRID_COLUMNS = {
@@ -66,6 +65,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             return null;
         }
         String movieid = intent.getStringExtra(MainFragment.MOV_KEY);
+        if(movieid == null)
+            return null;
         return new CursorLoader(
                 getActivity(),
                 MovieContract.MovieEntry.buildMoviesID(movieid),

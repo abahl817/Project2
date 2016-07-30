@@ -15,7 +15,7 @@ import com.facebook.stetho.dumpapp.DumperPlugin;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.Callback {
-    static boolean mTwoPane;
+    private boolean mTwoPane;
     private static final String VIEWPAGERFRAGMENT_TAG = "VPFTAG";
 
     @Override
@@ -28,8 +28,13 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
         if (findViewById(R.id.movie_detail_container) != null) {
             mTwoPane = true;
             if (savedInstanceState == null){
+                Bundle args = new Bundle();
+                args.putString(ViewPagerFragment.VIEWPAGER_ID,"0");
+
+                ViewPagerFragment fragment = new ViewPagerFragment();
+                fragment.setArguments(args);
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.movie_detail_container,new ViewPagerFragment(),VIEWPAGERFRAGMENT_TAG)
+                        .replace(R.id.movie_detail_container,fragment,VIEWPAGERFRAGMENT_TAG)
                         .commit();
             }
             else {

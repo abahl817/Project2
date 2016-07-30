@@ -79,6 +79,9 @@ public class ReviewFragment extends Fragment implements LoaderManager.LoaderCall
         Intent intent = getActivity().getIntent();
         String selection = MovieContract.ReviewEntry.COLUMN_MOVIE_ID + "=?";
         String movieid = intent.getStringExtra(MainFragment.MOV_KEY);
+        if(movieid == null){
+            return null;
+        }
         String[] selectionArgs = {movieid};
         Uri uri = MovieContract.ReviewEntry.CONTENT_URI;
         return new CursorLoader(getActivity(),

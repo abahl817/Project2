@@ -89,6 +89,9 @@ public class TrailerFragment extends Fragment implements LoaderManager.LoaderCal
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Intent intent = getActivity().getIntent();
         String movieid = intent.getStringExtra(MainFragment.MOV_KEY);
+        if (movieid == null){
+            return null;
+        }
         String[] selectionArgs = {movieid};
         String selection = MovieContract.TrailerEntry.COLUMN_MOVIE_ID + "=?";
         Uri uri = MovieContract.TrailerEntry.CONTENT_URI;

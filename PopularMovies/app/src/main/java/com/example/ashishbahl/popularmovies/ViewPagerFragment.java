@@ -104,6 +104,10 @@ public class ViewPagerFragment extends Fragment {
 
     private String getBackdropPath() {
         String movieid = getid();
+        String backdrop_path = null;
+        if(movieid == null){
+            return null;
+        }
         String[] projection = {MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
                 MovieContract.MovieEntry.COLUMN_BACKDROP};
         String selection = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
@@ -113,9 +117,11 @@ public class ViewPagerFragment extends Fragment {
                 selection,
                 selectionArgs,
                 null);
-        cursor.moveToFirst();
-        String backdrop_path = cursor.getString(1);
-        cursor.close();
+        if(cursor.moveToFirst())
+        {
+            backdrop_path = cursor.getString(1);
+            cursor.close();
+        }
         return backdrop_path;
     }
 
@@ -234,8 +240,12 @@ public class ViewPagerFragment extends Fragment {
     }
 
     private boolean isFavorite(){
-        boolean fav;
+        boolean fav = false;
+        int i;
         String movieid = getid();
+        if(movieid == null){
+            return false;
+        }
         String[] projection = {MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry._ID,
                 MovieContract.MovieEntry.COLUMN_IS_FAV};
         String selection = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
@@ -246,25 +256,27 @@ public class ViewPagerFragment extends Fragment {
                         selection,
                         selectionArgs,
                         null);
-        cursor.moveToFirst();
-        int i = cursor.getInt(1);
-        cursor.close();
-        if(i!=0)
-            fav = true;
-        else
-            fav = false;
+        if(cursor.moveToFirst()) {
+            i = cursor.getInt(1);
+            cursor.close();
+            if (i != 0)
+                fav = true;
+            else
+                fav = false;
+        }
         return fav;
     }
 
     private String getid(){
-        Intent intent = getActivity().getIntent();
-        String movieid = null;
-        if(intent != null){
-            movieid = intent.getStringExtra(MainFragment.MOV_KEY);
+        if(mId == null) {
+
+            Intent intent = getActivity().getIntent();
+            String movieid = null;
+            if (intent != null) {
+                return intent.getStringExtra(MainFragment.MOV_KEY);
+            }
         }
-        else
-            movieid = mId;
-        return movieid;
+        return mId;
     }
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {
