@@ -26,6 +26,7 @@ public class ReviewFragment extends Fragment implements LoaderManager.LoaderCall
     private static final String LOG_TAG = ReviewFragment.class.getSimpleName();
     private ReviewAdapter reviewAdapter;
     private static final int REVIEW_LOADER = 0;
+    private String mId;
 
     private static final String[] REVIEW_COLUMNS = {
             MovieContract.ReviewEntry.TABLE_NAME + "." + MovieContract.ReviewEntry._ID,
@@ -45,6 +46,10 @@ public class ReviewFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+        if(arguments != null){
+            mId = arguments.getString(ViewPagerFragment.VIEWPAGER_ID);
+        }
         reviewAdapter = new ReviewAdapter(getActivity(), null);
         View rootView = inflater.inflate(R.layout.fragment_review, container, false);
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.review_list);
@@ -63,22 +68,21 @@ public class ReviewFragment extends Fragment implements LoaderManager.LoaderCall
         super.onActivityCreated(savedInstanceState);
     }
 
+    private String getid(){
+        if(mId == null) {
+
+            Intent intent = getActivity().getIntent();
+            if (intent != null) {
+                return intent.getStringExtra(MainFragment.MOV_KEY);
+            }
+        }
+        return mId;
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] i = {"258489"};
-        /*Cursor cursor = getActivity().getContentResolver().query(MovieContract.ReviewEntry.CONTENT_URI,
-                REVIEW_COLUMNS,
-                selection,
-                i,
-                null);
-        cursor.moveToFirst();
-        String review = cursor.getString(COL_CONTENT);
-        Log.v(LOG_TAG, "review: " + review);
-        cursor.close();*/
-
-        Intent intent = getActivity().getIntent();
         String selection = MovieContract.ReviewEntry.COLUMN_MOVIE_ID + "=?";
-        String movieid = intent.getStringExtra(MainFragment.MOV_KEY);
+        String movieid = getid();
         if(movieid == null){
             return null;
         }

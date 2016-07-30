@@ -26,7 +26,7 @@ public class TrailerFragment extends Fragment implements LoaderManager.LoaderCal
     private static final String LOG_TAG = TrailerFragment.class.getSimpleName();
     private TrailerAdapter trailerAdapter;
     private static final int TRAILER_LOADER = 0;
-
+    private String mId;
     private static final String[] TRAILER_COLUMNS = {
             MovieContract.TrailerEntry.TABLE_NAME + "." + MovieContract.TrailerEntry._ID,
             MovieContract.TrailerEntry.COLUMN_MOVIE_ID,
@@ -49,6 +49,10 @@ public class TrailerFragment extends Fragment implements LoaderManager.LoaderCal
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.v(LOG_TAG, "trailerfragment oncreateview");
+        Bundle arguments = getArguments();
+        if(arguments != null){
+            mId = arguments.getString(ViewPagerFragment.VIEWPAGER_ID);
+        }
         trailerAdapter = new TrailerAdapter(getActivity(), null);
         View rootView = inflater.inflate(R.layout.fragment_trailer, container, false);
         final RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.trailer_list);
@@ -85,10 +89,20 @@ public class TrailerFragment extends Fragment implements LoaderManager.LoaderCal
         super.onActivityCreated(savedInstanceState);
     }
 
+    private String getid(){
+        if(mId == null) {
+
+            Intent intent = getActivity().getIntent();
+            if (intent != null) {
+                return intent.getStringExtra(MainFragment.MOV_KEY);
+            }
+        }
+        return mId;
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Intent intent = getActivity().getIntent();
-        String movieid = intent.getStringExtra(MainFragment.MOV_KEY);
+        String movieid = getid();
         if (movieid == null){
             return null;
         }

@@ -48,6 +48,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+        if(arguments != null){
+            mId = arguments.getString(ViewPagerFragment.VIEWPAGER_ID);
+        }
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         return rootView;
     }
@@ -58,13 +62,20 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onActivityCreated(savedInstanceState);
     }
 
+    private String getid(){
+        if(mId == null) {
+
+            Intent intent = getActivity().getIntent();
+            if (intent != null) {
+                return intent.getStringExtra(MainFragment.MOV_KEY);
+            }
+        }
+        return mId;
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Intent intent = getActivity().getIntent();
-        if (intent == null) {
-            return null;
-        }
-        String movieid = intent.getStringExtra(MainFragment.MOV_KEY);
+        String movieid = getid();
         if(movieid == null)
             return null;
         return new CursorLoader(

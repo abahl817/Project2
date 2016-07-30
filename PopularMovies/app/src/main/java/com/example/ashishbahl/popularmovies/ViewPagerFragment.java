@@ -127,9 +127,20 @@ public class ViewPagerFragment extends Fragment {
 
     private void setupViewPager(ViewPager mViewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        adapter.addFragment(new DetailFragment(),"Details");
-        adapter.addFragment(new ReviewFragment(),"Reviews");
-        adapter.addFragment(new TrailerFragment(),"Trailers");
+        Bundle args = new Bundle();
+        args.putString(ViewPagerFragment.VIEWPAGER_ID,mId);
+
+        DetailFragment detailFragment = new DetailFragment();
+        detailFragment.setArguments(args);
+
+        ReviewFragment reviewFragment = new ReviewFragment();
+        reviewFragment.setArguments(args);
+
+        TrailerFragment trailerFragment = new TrailerFragment();
+        trailerFragment.setArguments(args);
+        adapter.addFragment(detailFragment,"Details");
+        adapter.addFragment(reviewFragment,"Reviews");
+        adapter.addFragment(trailerFragment,"Trailers");
         mViewPager.setAdapter(adapter);
     }
 
@@ -271,7 +282,6 @@ public class ViewPagerFragment extends Fragment {
         if(mId == null) {
 
             Intent intent = getActivity().getIntent();
-            String movieid = null;
             if (intent != null) {
                 return intent.getStringExtra(MainFragment.MOV_KEY);
             }

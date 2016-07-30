@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements MainFragment.Callback {
     private boolean mTwoPane;
     private static final String VIEWPAGERFRAGMENT_TAG = "VPFTAG";
-
+    private static final String ORIENTATION = "orientation";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +52,16 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        outState.putBoolean(ORIENTATION,mTwoPane);
+        super.onSaveInstanceState(outState);
+    }
+    @Override
+    public void onRestoreInstanceState(Bundle outState){
+        mTwoPane = outState.getBoolean(ORIENTATION);
+        super.onRestoreInstanceState(outState);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
